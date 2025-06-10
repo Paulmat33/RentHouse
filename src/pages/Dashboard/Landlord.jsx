@@ -1,6 +1,6 @@
 import MainLayout from "../../layout/MainLayout";
 import { Bell, UserCircle, DollarSign, AlertTriangle, XCircle } from "lucide-react";
-import { useUser } from "../../context/UserContext";
+// import { useUser } from "../../context/UserContext";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -16,9 +16,9 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, ChartDataLabels);
 
 function LandlordDashboard() {
-  const { user } = useUser() || {};
-  const username = user?.name || "Landlord";
-  const role = user?.role || "landlord";
+  // const { user } = useUser() || {};
+  // const username = user?.name || "Landlord";
+  // const role = user?.role || "landlord";
 
   // Bar chart data
   const barData = {
@@ -108,30 +108,6 @@ function LandlordDashboard() {
 
   return (
     <MainLayout>
-      {/* Top Bar */}
-      <div className="flex items-center justify-between mb-8">
-        {/* Search Bar */}
-        <div className="flex items-center w-full max-w-md bg-white rounded-lg shadow px-2 py-1">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="flex-1 px-3 py-2 outline-none bg-transparent"
-          />
-          <button className="bg-[#4D0000] text-white px-4 py-2 rounded-lg ml-2 hover:bg-[#6a1a1a]">
-            Search
-          </button>
-        </div>
-        {/* Right Side: Bell, User Pic, Username, Role */}
-        <div className="flex items-center gap-4 ml-6">
-          <Bell className="w-6 h-6 text-gray-600" />
-          <UserCircle className="w-8 h-8 text-gray-600" />
-          <div className="flex flex-col">
-            <span className="font-semibold text-gray-800">{username}</span>
-            <span className="text-xs text-gray-500 capitalize">{role}</span>
-          </div>
-        </div>
-      </div>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Total Property */}

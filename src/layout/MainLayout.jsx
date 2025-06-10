@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import logo from "../assets/footerlogo.png";
-import { Home, Users, Wallet, Plus, List, Eye, Wrench, Mail, Settings } from "lucide-react";
+import { Home, Users, Wallet, Plus, List, Eye, Wrench, Mail, Settings, UserCircle, Bell } from "lucide-react";
 
 function MainLayout({ children }) {
-  const { user } = useUser(); // Make sure user has a 'role' property
+  const { user } = useUser() || {};
+  const username = user?.name || "Landlord";
+  const role = user?.role || "landlord";
 
   // Landlord sidebar links
   const landlordLinks = (
@@ -103,7 +105,33 @@ function MainLayout({ children }) {
         {/* Logout */}
         <Link to="/" className="text-red-300 hover:underline">Logout</Link>
       </aside>
-      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto ml-64">{children}</main>
+      
+      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto ml-64">
+        {/* Search Bar and User Info */}
+        <div className="flex items-center justify-between mb-8">
+          {/* Search Bar */}
+          <div className="flex items-center w-full max-w-md bg-white rounded-lg shadow px-2 py-1">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="flex-1 px-3 py-2 outline-none bg-transparent"
+            />
+            <button className="bg-[#4D0000] text-white px-4 py-2 rounded-lg ml-2 hover:bg-[#6a1a1a]">
+              Search
+            </button>
+          </div>
+          {/* Right Side: Bell, User Pic, Username, Role */}
+          <div className="flex items-center gap-4 ml-6">
+            <Bell className="w-6 h-6 text-gray-600" />
+            <UserCircle className="w-8 h-8 text-gray-600" />
+            <div className="flex flex-col">
+              <span className="font-semibold text-gray-800">{username}</span>
+              <span className="text-xs text-gray-500 capitalize">{role}</span>
+            </div>
+          </div>
+        </div>
+        {children}
+      </main>
     </div>
   );
 }

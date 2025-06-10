@@ -13,6 +13,8 @@ function AddProperty() {
     type: "",
     category: "",
     address: "",
+    price: "",
+    laoction: "",
     description: "",
     images: [],
   });
@@ -51,7 +53,17 @@ function AddProperty() {
     e.preventDefault();
     // You may need to handle file upload logic here
     addProperty(formData);
-    navigate("/dashboard/landlord/properties");
+    navigate("/dashboard/landlord/property-listing");
+    setFormData({
+      title: "",
+      type: "",
+      category: "",
+      address: "",
+      price: "",
+      location: "",
+      description: "",
+      images: [],
+    });
   };
 
   // Add this function inside your AddProperty component
@@ -113,6 +125,31 @@ function AddProperty() {
               <option value="sale">Sale</option>
               {/* Add more categories as needed */}
             </select>
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="block mb-1 font-bold">Location</label>
+            <input
+            name="location"
+            type="text"
+            // placeholder="Enter address"
+            className="w-full p-2 border rounded-xl"
+            onChange={handleChange}
+            required
+          />
+          </div>
+          <div className="flex-1">
+            <label className="block mb-1 font-bold">Price</label>
+           <input
+            name="price"
+            type="number"
+            // placeholder="Enter address"
+            className="w-full p-2 border rounded-xl"
+            onChange={handleChange}
+            required
+          />
           </div>
         </div>
         <div>
