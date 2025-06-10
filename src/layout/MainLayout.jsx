@@ -97,7 +97,7 @@ function MainLayout({ children }) {
   return (
     <div className="min-h-screen flex font-inter">
       <aside className="w-64 bg-[#4D0000] text-white p-6 h-screen fixed top-0 left-0 flex flex-col">
-        <img src={logo} alt="RentHouse Logo" className="h-12 w-6 mb-6" />
+        <img src={logo} alt="RentHouse Logo" className="h-12 w-[100px] mb-6" />
         {/* Render links based on user role */}
         {user?.role === "admin" ? adminLinks : landlordLinks}
         {/* Logout */}
