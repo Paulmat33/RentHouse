@@ -1,5 +1,9 @@
-import { Facebook, Twitter, Instagram } from "lucide-react";
 import { Link } from "react-router-dom"
+import footerLogo from "../assets/footerlogo.png";
+import fb from "../assets/fb.png";
+import instagram from "../assets/instagram.png";
+import link from "../assets/link.png";
+import youtube from "../assets/youtube.png";
 
 function Footer() {
   return (
@@ -14,21 +18,28 @@ function Footer() {
           <Link to="/contact" className="hover:underline">Contact</Link>
         </div>
         {/* Social media icons (center) */}
-        <div className="flex flex-row gap-6 justify-center flex-1">
+        <div >
+          <div>
+            <h1 className="font-bold mb-2">Get in Touch</h1>
+          </div>
+          <div className="flex flex-row gap-6 justify-center flex-1">
           <Link to="#" aria-label="Facebook" className="hover:text-gray-300">
-            <Facebook size={28} />
-          </Link>
-          <Link to="#" aria-label="Twitter" className="hover:text-gray-300">
-            <Twitter size={28} />
+            <img src={fb} alt="Facebook" className="w-7 h-7" />
           </Link>
           <Link to="#" aria-label="Instagram" className="hover:text-gray-300">
-            <Instagram size={28} />
+            <img src={instagram} alt="Instagram" className="w-7 h-7" />
           </Link>
+          <Link to="#" aria-label="LinkedIn" className="hover:text-gray-300">
+            <img src={link} alt="LinkedIn" className="w-7 h-7" />
+          </Link>
+          <Link to="#" aria-label="YouTube" className="hover:text-gray-300">
+            <img src={youtube} alt="YouTube" className="w-7 h-7" />
+          </Link>
+          </div>
         </div>
         {/* Logo (right) */}
         <div className="flex flex-col items-end flex-1">
-          <img src="/logo.png" alt="RentHouse Logo" className="w-24 h-auto mb-2" />
-          <span className="font-bold text-lg">RentHouse</span>
+          <img src={footerLogo} alt="RentHouse Logo" className="w-24 h-auto mb-2" />
         </div>
       </div>
       <hr className="border-t border-white opacity-30" />
