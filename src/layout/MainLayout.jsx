@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import logo from "../assets/footerlogo.png";
-import { Home, Users, Wallet, Plus, List, Eye, Wrench, Mail, Settings, UserCircle, Bell } from "lucide-react";
+import { Home, Users, Wallet, Plus, List, Eye, Wrench, Mail, Settings, UserCircle, Bell, ListCheckIcon } from "lucide-react";
 
 function MainLayout({ children }) {
   const { user } = useUser() || {};
@@ -55,41 +55,40 @@ function MainLayout({ children }) {
     </>
   );
 
-  // Admin sidebar links (example, adjust routes as needed)
-  const adminLinks = (
+  const tenantLinks = (
     <>
-      <h1 className="text-[24px] font-bold mb-4">Admin Dashboard</h1>
+      <h1 className="text-[20px] font-semibold mb-4">Tenant Dashboard</h1>
       <nav className="flex flex-col space-y-2 mb-8">
-        <Link to="/dashboard/admin/overview" className="flex items-center gap-2 hover:underline">
-          <Home size={18} /> Overview
+        <Link to="/dashboard/tenant/listing" className="flex items-center gap-2 hover:underline">
+          <ListCheckIcon size={18} /> Listing
         </Link>
-        <Link to="/dashboard/admin/users" className="flex items-center gap-2 hover:underline">
-          <Users size={18} /> Users
+        <Link to="/dashboard/tenant/payments" className="flex items-center gap-2 hover:underline">
+          <Wallet size={18} /> Payments
         </Link>
-        <Link to="/dashboard/admin/finance" className="flex items-center gap-2 hover:underline">
-          <Wallet size={18} /> Finance
+        <Link to="/dashboard/tenant/profile" className="flex items-center gap-2 hover:underline">
+          <Users size={18} /> Profile
         </Link>
       </nav>
 
-      <h2 className="text-[24px] font-bold mb-4 mt-8">Quick Links</h2>
+      <h2 className="text-[20px] font-semibold mb-4 mt-8">Quick Links</h2>
       <nav className="flex flex-col space-y-2 mb-8">
-        <Link to="/dashboard/admin/add-user" className="flex items-center gap-2 hover:underline">
-          <Plus size={18} /> Add User
+        <Link to="/dashboard/tenant/rent-receipt" className="flex items-center gap-2 hover:underline">
+          <Plus size={18} /> Rent Receipt
         </Link>
-        <Link to="/dashboard/admin/user-list" className="flex items-center gap-2 hover:underline">
-          <List size={18} /> User Listing
+        <Link to="/dashboard/tenant/rent-history" className="flex items-center gap-2 hover:underline">
+          <List size={18} /> Rent History
         </Link>
-        <Link to="/dashboard/admin/activity" className="flex items-center gap-2 hover:underline">
-          <Eye size={18} /> View Activity
+        <Link to="/dashboard/tenant/maintenance" className="flex items-center gap-2 hover:underline">
+          <Eye size={18} /> Maintenance Requests
         </Link>
       </nav>
 
-      <h2 className="text-[24px] font-bold mb-4 mt-8">Other</h2>
+      <h2 className="text-[20px] font-semibold mb-4 mt-8">Other</h2>
       <nav className="flex flex-col space-y-2 mb-8">
-        <Link to="/dashboard/admin/settings" className="flex items-center gap-2 hover:underline">
+        <Link to="/dashboard/tenant/settings" className="flex items-center gap-2 hover:underline">
           <Settings size={18} /> Settings
         </Link>
-        <Link to="/dashboard/admin/messages" className="flex items-center gap-2 hover:underline">
+        <Link to="/dashboard/tenant/messages" className="flex items-center gap-2 hover:underline">
           <Mail size={18} /> Messages
         </Link>
       </nav>
@@ -101,7 +100,9 @@ function MainLayout({ children }) {
       <aside className="w-64 bg-[#4D0000] text-white p-6 h-screen fixed top-0 left-0 flex flex-col">
         <img src={logo} alt="RentHouse Logo" className="h-12 w-[100px] mb-6" />
         {/* Render links based on user role */}
-        {user?.role === "admin" ? adminLinks : landlordLinks}
+        {user?.role === "tenant"
+          ? tenantLinks 
+          : landlordLinks}
         {/* Logout */}
         <Link to="/" className="text-red-300 hover:underline">Logout</Link>
       </aside>

@@ -10,7 +10,7 @@ function Login() {
 
   // Accept formData instead of event
   const handleLogin = (formData) => {
-    const role = "landlord"; // or "landlord" — switch this manually for now
+    const role = formData.accountType || "tenant";
     const fakeUser = { name: "Paul", role };
     login(fakeUser);
     navigate(`/dashboard/${role}`);

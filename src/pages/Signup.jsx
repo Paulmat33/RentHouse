@@ -6,6 +6,7 @@ import logo from "../assets/footerlogo.png";
 function Signup() {
   const handleSignup = (data) => {
     // handle signup logic here
+    alert("sign up successful");
     console.log("Signup submitted", data);
   };
 

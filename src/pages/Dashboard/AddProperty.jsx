@@ -14,7 +14,7 @@ function AddProperty() {
     category: "",
     address: "",
     price: "",
-    laoction: "",
+    location: "",
     description: "",
     images: [],
   });

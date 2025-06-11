@@ -16,7 +16,7 @@ function Landing() {
           <h1 className="text-[50px] font-bold pb-1.5 font-poppins ">Rent Directly From Owner!</h1>
           <p className="text-[25px] font-normal pb-[28.8px] font-poppins ">Modern, Well maintained Homes with Faster Responses and Direct Leasing. No Hidden Fees</p>
           <button className="bg-[#4D0000] text-white px-6 py-3 rounded hover:bg-[#5A0000] font-medium text-[20px] font-poppins">
-            <Link to="#">See Available Units</Link>
+            <Link to="/listing">See Available Units</Link>
           </button>
         </div>
 

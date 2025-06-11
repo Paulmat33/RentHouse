@@ -13,7 +13,7 @@ function Navbar() {
       </Link>
       <div className="flex space-x-6 font-medium text-[20px] text-[#000000]">
         <Link to="/">Home</Link>
-        <Link to="/properties">Properties</Link>
+        <Link to="/listing">Properties</Link>
         <Link to="/services">Services</Link>
         <Link to="/about">About Us</Link>
         <Link to="/contact">Contact Us</Link>

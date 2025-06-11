@@ -32,35 +32,37 @@ function AuthForm({ type, onSubmit }) {
     <form onSubmit={handleSubmit} className="space-y-4 font-inter">
       {type === "signup" && (
         <>
-          <div>
+          {(type === "signup" || type === "login") && (
             <div>
-              <h1>Account Type</h1>
+              <div>
+                <h1>Account Type</h1>
+              </div>
+              <div className="flex space-x-4 mb-2">
+                <label className="flex items-center ">
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="tenant"
+                    checked={accountType === "tenant"}
+                    onChange={handleAccountTypeChange}
+                    className="mr-2 accent-black cursor-pointer"
+                  />
+                  Tenant
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value="landlord"
+                    checked={accountType === "landlord"}
+                    onChange={handleAccountTypeChange}
+                    className="mr-2 accent-black cursor-pointer"
+                  />
+                  Landlord
+                </label>
+              </div>
             </div>
-            <div className="flex space-x-4 mb-2">
-              <label className="flex items-center ">
-                <input
-                  type="radio"
-                  name="accountType"
-                  value="tenant"
-                  checked={accountType === "tenant"}
-                  onChange={handleAccountTypeChange}
-                  className="mr-2 accent-black cursor-pointer"
-                />
-                Tenant
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="accountType"
-                  value="landlord"
-                  checked={accountType === "landlord"}
-                  onChange={handleAccountTypeChange}
-                  className="mr-2 accent-black cursor-pointer"
-                />
-                Landlord
-              </label>
-            </div>
-          </div>
+          )}
 
           <label className="block">
             Full Name
