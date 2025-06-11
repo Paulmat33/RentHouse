@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 function AuthForm({ type, onSubmit }) {
-  const [accountType, setAccountType] = useState("tenant");
   const [form, setForm] = useState({
-    fullname: "",
     email: "",
+    password: "",
+    accountType: "", // <-- add this
+    fullname: "",
     phonenumber: "",
     employment: "",
     stateOfOrigin: "",
     permanentAddress: "",
     placeOfWork: "",
-    password: "",
     confirmPassword: "",
   });
 
@@ -20,50 +20,52 @@ function AuthForm({ type, onSubmit }) {
   };
 
   const handleAccountTypeChange = (e) => {
-    setAccountType(e.target.value);
+    setForm((prev) => ({
+      ...prev,
+      accountType: e.target.value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onSubmit) onSubmit({ ...form, accountType });
+    onSubmit(form); // form includes accountType
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 font-inter">
+      {/* Account Type selection for both signup and login */}
+      <div>
+        <div>
+          <h1>Account Type</h1>
+        </div>
+        <div className="flex space-x-4 mb-2">
+          <label className="flex items-center ">
+            <input
+              type="radio"
+              name="accountType"
+              value="tenant"
+              checked={form.accountType === "tenant"}
+              onChange={handleAccountTypeChange}
+              className="mr-2 accent-black cursor-pointer"
+            />
+            Tenant
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="accountType"
+              value="landlord"
+              checked={form.accountType === "landlord"}
+              onChange={handleAccountTypeChange}
+              className="mr-2 accent-black cursor-pointer"
+            />
+            Landlord
+          </label>
+        </div>
+      </div>
+
       {type === "signup" && (
         <>
-          {(type === "signup" || type === "login") && (
-            <div>
-              <div>
-                <h1>Account Type</h1>
-              </div>
-              <div className="flex space-x-4 mb-2">
-                <label className="flex items-center ">
-                  <input
-                    type="radio"
-                    name="accountType"
-                    value="tenant"
-                    checked={accountType === "tenant"}
-                    onChange={handleAccountTypeChange}
-                    className="mr-2 accent-black cursor-pointer"
-                  />
-                  Tenant
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="accountType"
-                    value="landlord"
-                    checked={accountType === "landlord"}
-                    onChange={handleAccountTypeChange}
-                    className="mr-2 accent-black cursor-pointer"
-                  />
-                  Landlord
-                </label>
-              </div>
-            </div>
-          )}
-
           <label className="block">
             Full Name
             <input
@@ -106,7 +108,7 @@ function AuthForm({ type, onSubmit }) {
           </div>
 
           {/* Tenant-specific fields */}
-          {accountType === "tenant" && (
+          {form.accountType === "tenant" && (
             <>
               {/* Employment & State of Origin side by side */}
               <div className="flex space-x-4">

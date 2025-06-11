@@ -184,7 +184,7 @@ function AddProperty() {
           >
             <button
               type="button"
-              className="bg-white text-[#4D0000] px-4 py-2 rounded shadow cursor-pointer hover:bg-gray-100"
+              className="bg-white text-[#4D0000] px-4 py-2 rounded shadow cursor-pointer"
               onClick={e => {
                 e.stopPropagation();
                 fileInputRef.current.click();
