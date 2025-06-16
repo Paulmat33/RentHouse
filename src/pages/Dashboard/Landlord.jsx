@@ -1,6 +1,5 @@
 import MainLayout from "../../layout/MainLayout";
 import { Bell, UserCircle, DollarSign, AlertTriangle, XCircle } from "lucide-react";
-// import { useUser } from "../../context/UserContext";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -16,9 +15,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend, ChartDataLabels);
 
 function LandlordDashboard() {
-  // const { user } = useUser() || {};
-  // const username = user?.name || "Landlord";
-  // const role = user?.role || "landlord";
+  
 
   // Bar chart data
   const barData = {
@@ -131,17 +128,19 @@ function LandlordDashboard() {
       </div>
 
       {/* Charts Section */}
-      <div className="flex flex-col md:flex-row gap-8 mb-8">
-        {/* Bar Chart */}
-        <div className="bg-white rounded-lg shadow p-6 flex-1">
-          <h2 className="text-xl font-bold mb-2">Revenue Overview</h2>
-          <p className="text-gray-500 mb-4 text-sm">Report from Jan-25 - May-25</p>
-          <Bar data={barData} options={barOptions} plugins={[ChartDataLabels]} />
-        </div>
-        {/* Doughnut Chart */}
-        <div className="bg-white rounded-lg shadow p-6 flex-1 flex flex-col items-center">
-          <h2 className="text-xl font-bold mb-4">Monthly Property Expenses</h2>
-          <Doughnut data={doughnutData} options={doughnutOptions} />
+      <div className="flex items-center mb-8">
+        <div className="w-full flex flex-col md:flex-row gap-8">
+          {/* Bar Chart */}
+          <div className="bg-white rounded-lg shadow p-6 w-full md:w-2/3">
+            <h2 className="text-xl font-bold mb-2">Revenue Overview</h2>
+            <p className="text-gray-500 mb-4 text-sm">Report from Jan-25 - May-25</p>
+            <Bar data={barData} options={barOptions} plugins={[ChartDataLabels]} />
+          </div>
+          {/* Doughnut Chart */}
+          <div className="bg-white rounded-lg shadow p-6 w-full md:w-2/3 flex flex-col items-center">
+            <h2 className="text-xl font-bold mb-4">Monthly Property Expenses</h2>
+            <Doughnut data={doughnutData} options={doughnutOptions} />
+          </div>
         </div>
       </div>
 

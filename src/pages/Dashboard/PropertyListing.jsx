@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useProperties } from "../../context/PropertyContext";
+// import { useProperties } from "../../context/PropertyContext";
 import MainLayout from "../../layout/MainLayout";
 
 function PropertyListing() {
-  const { properties, deleteProperty, updateProperty } = useProperties();
+  // const { properties, deleteProperty, updateProperty } = useProperties();
   const [carouselIndex, setCarouselIndex] = useState({});
   const [editId, setEditId] = useState(null);
   const [editForm, setEditForm] = useState({});

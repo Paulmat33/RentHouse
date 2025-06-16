@@ -1,9 +1,9 @@
 import MainLayout from "../layout/MainLayout";
 import PropertyCard from "../components/PropertyCard";
-import { useProperties } from "../context/PropertyContext";
+// import { useProperties } from "../context/PropertyContext";
 
 function TenantProperties() {
-  const { properties } = useProperties();
+  // const { properties } = useProperties();
 
   return (
     <MainLayout>

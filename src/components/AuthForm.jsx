@@ -1,255 +1,220 @@
-import React, { useState } from "react";
+import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Link } from "react-router-dom";
+import { signupActionTenant, signupActionLandlord } from "../api/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import * as Yup from "yup";
+// import { useUser } from "../context/UserContext";
 
-function AuthForm({ type, onSubmit }) {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    accountType: "", // <-- add this
-    fullname: "",
-    phonenumber: "",
-    employment: "",
-    stateOfOrigin: "",
-    permanentAddress: "",
-    placeOfWork: "",
-    confirmPassword: "",
-  });
+const validationSchema = Yup.object().shape({
+  accountType: Yup.string().required("Account type is required"),
+  fullName: Yup.string().required("Full name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phoneNumber: Yup.string().required("Phone number is required"),
+  permanentAddress: Yup.string().required("Permanent address is required"),
+  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm password is required"),
+  // Tenant-specific fields
+  employmentStatus: Yup.string().when("accountType", {
+    is: "tenant",
+    then: (schema) => schema.required("Employment status is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  stateOfOrigin: Yup.string().when("accountType", {
+    is: "tenant",
+    then: (schema) => schema.required("State of origin is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  placeOfWork: Yup.string().when("accountType", {
+    is: "tenant",
+    then: (schema) => schema.required("Place of work is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+});
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+const initialValues = {
+  accountType: "",
+  fullName: "",
+  email: "",
+  phoneNumber: "",
+  permanentAddress: "",
+  password: "",
+  confirmPassword: "",
+  employmentStatus: "",
+  stateOfOrigin: "",
+  placeOfWork: "",
+};
 
-  const handleAccountTypeChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      accountType: e.target.value,
-    }));
-  };
+function AuthForm() {
+  // const { setUser } = useUser(); // Uncomment if you use context
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(form); // form includes accountType
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      if (values.accountType === "tenant") {
+        await signupActionTenant(values);
+      } else {
+        await signupActionLandlord(values);
+      }
+      toast.success("Signup successful!");
+      resetForm();
+    } catch (error) {
+      toast.error(error.message || "Signup failed");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 font-inter">
-      {/* Account Type selection for both signup and login */}
-      <div>
-        <div>
-          <h1>Account Type</h1>
-        </div>
-        <div className="flex space-x-4 mb-2">
-          <label className="flex items-center ">
-            <input
-              type="radio"
-              name="accountType"
-              value="tenant"
-              checked={form.accountType === "tenant"}
-              onChange={handleAccountTypeChange}
-              className="mr-2 accent-black cursor-pointer"
-            />
-            Tenant
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="accountType"
-              value="landlord"
-              checked={form.accountType === "landlord"}
-              onChange={handleAccountTypeChange}
-              className="mr-2 accent-black cursor-pointer"
-            />
-            Landlord
-          </label>
-        </div>
-      </div>
-
-      {type === "signup" && (
-        <>
-          <label className="block">
-            Full Name
-            <input
-              type="text"
-              name="fullname"
-              // placeholder="Full Name"
-              className="w-full px-4 py-2 border border-[#000000] rounded-xl"
-              value={form.fullname}
-              onChange={handleChange}
-              required
-            />
-          </label>
-
-          {/* Email & Phone side by side */}
-          <div className="flex space-x-4">
-            <label className="w-1/2 block">
-              Email
-              <input
-                type="email"
-                name="email"
-                // placeholder="Email"
-                className="w-full px-4 py-2 border rounded-xl"
-                value={form.email}
-                onChange={handleChange}
-                required
-              />
-            </label>
-            <label className="w-1/2 block">
-              Phone Number
-              <input
-                type="text"
-                name="phonenumber"
-                // placeholder="Phone Number"
-                className="w-full px-4 py-2 border rounded-xl"
-                value={form.phonenumber}
-                onChange={handleChange}
-                required
-              />
-            </label>
-          </div>
-
-          {/* Tenant-specific fields */}
-          {form.accountType === "tenant" && (
-            <>
-              {/* Employment & State of Origin side by side */}
-              <div className="flex space-x-4">
-                <label className="w-1/2 block">
-                  Employment Status
-                  <input
-                    type="text"
-                    name="employment"
-                    // placeholder="Employment Status"
-                    className="w-full px-4 py-2 border rounded-xl"
-                    value={form.employment}
-                    onChange={handleChange}
-                    required
+    <>
+      <ToastContainer />
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ values, isSubmitting }) => (
+          <Form className="space-y-4 font-inter">
+            {/* Account Type selection */}
+            <div>
+              <h1>Account Type</h1>
+              <div className="flex space-x-4 mb-2">
+                <label className="flex items-center">
+                  <Field
+                    type="radio"
+                    name="accountType"
+                    value="tenant"
+                    className="mr-2 accent-black cursor-pointer"
                   />
+                  Tenant
                 </label>
-                <label className="w-1/2 block">
-                  State of Origin
-                  <input
-                    type="text"
-                    name="stateOfOrigin"
-                    // placeholder="State of Origin"
-                    className="w-full px-4 py-2 border rounded-xl"
-                    value={form.stateOfOrigin}
-                    onChange={handleChange}
-                    required
+                <label className="flex items-center">
+                  <Field
+                    type="radio"
+                    name="accountType"
+                    value="landlord"
+                    className="mr-2 accent-black cursor-pointer"
                   />
+                  Landlord
                 </label>
               </div>
-              <label className="block">
-                Place of Work
-                <input
-                  type="text"
-                  name="placeOfWork"
-                  // placeholder="Place of Work"
+              <ErrorMessage name="accountType" component="div" className="text-red-500" />
+            </div>
+
+            <label className="block">
+              Full Name
+              <Field
+                type="text"
+                name="fullName"
+                className="w-full px-4 py-2 border border-[#000000] rounded-xl"
+              />
+              <ErrorMessage name="fullName" component="div" className="text-red-500" />
+            </label>
+
+            {/* Email & Phone side by side */}
+            <div className="flex space-x-4">
+              <label className="w-1/2 block">
+                Email
+                <Field
+                  type="email"
+                  name="email"
                   className="w-full px-4 py-2 border rounded-xl"
-                  value={form.placeOfWork}
-                  onChange={handleChange}
-                  required
                 />
+                <ErrorMessage name="email" component="div" className="text-red-500" />
               </label>
-            </>
-          )}
+              <label className="w-1/2 block">
+                Phone Number
+                <Field
+                  type="text"
+                  name="phoneNumber"
+                  className="w-full px-4 py-2 border rounded-xl"
+                />
+                <ErrorMessage name="phoneNumber" component="div" className="text-red-500" />
+              </label>
+            </div>
 
-          <label className="block">
-            Permanent Address
-            <input
-              type="text"
-              name="permanentAddress"
-              // placeholder="Permanent Address"
-              className="w-full px-4 py-2 border rounded-xl"
-              value={form.permanentAddress}
-              onChange={handleChange}
-              required
-            />
-          </label>
+            {/* Tenant-specific fields */}
+            {values.accountType === "tenant" && (
+              <>
+                <div className="flex space-x-4">
+                  <label className="w-1/2 block">
+                    Employment Status
+                    <Field
+                      type="text"
+                      name="employmentStatus"
+                      className="w-full px-4 py-2 border rounded-xl"
+                    />
+                    <ErrorMessage name="employmentStatus" component="div" className="text-red-500" />
+                  </label>
+                  <label className="w-1/2 block">
+                    State of Origin
+                    <Field
+                      type="text"
+                      name="stateOfOrigin"
+                      className="w-full px-4 py-2 border rounded-xl"
+                    />
+                    <ErrorMessage name="stateOfOrigin" component="div" className="text-red-500" />
+                  </label>
+                </div>
+                <label className="block">
+                  Place of Work
+                  <Field
+                    type="text"
+                    name="placeOfWork"
+                    className="w-full px-4 py-2 border rounded-xl"
+                  />
+                  <ErrorMessage name="placeOfWork" component="div" className="text-red-500" />
+                </label>
+              </>
+            )}
 
-          {/* Password & Confirm Password side by side */}
-          <div className="flex space-x-4">
-            <label className="w-1/2 block">
-              Password
-              <input
-                type="password"
-                name="password"
-                // placeholder="Password"
+            <label className="block">
+              Permanent Address
+              <Field
+                type="text"
+                name="permanentAddress"
                 className="w-full px-4 py-2 border rounded-xl"
-                value={form.password}
-                onChange={handleChange}
-                required
               />
+              <ErrorMessage name="permanentAddress" component="div" className="text-red-500" />
             </label>
-            <label className="w-1/2 block">
-              Confirm Password
-              <input
-                type="password"
-                name="confirmPassword"
-                // placeholder="Confirm Password"
-                className="w-full px-4 py-2 border rounded-xl"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-            </label>
-          </div>
-        </>
-      )}
 
-      {type !== "signup" && (
-        <div className="p-10">
-          <label className="block mb-12">
-            Email
-            <input
-              type="email"
-              name="email"
-              placeholder="info.johncane333@gmail.com"
-              className="w-full px-4 py-2 border rounded-xl mt-1"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          <label className="block">
-            Password
-            <input
-              type="password"
-              name="password"
-              placeholder="*****************"
-              className="w-full px-4 py-2 border rounded-xl mt-1"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          {/* Remember me and Forgot Password */}
-          <div className="flex items-center justify-between mt-12">
-            <label className="flex items-center text-sm">
-              <input
-                type="checkbox"
-                name="remember"
-                className="mr-2 accent-[#4D0000] cursor-pointer"
-              />
-              Remember me
-            </label>
-            <Link
-              to="#"
-              className="text-[#000000] text-sm hover:underline"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-        </div>
-      )}
+            {/* Password & Confirm Password side by side */}
+            <div className="flex space-x-4">
+              <label className="w-1/2 block">
+                Password
+                <Field
+                  type="password"
+                  name="password"
+                  className="w-full px-4 py-2 border rounded-xl"
+                />
+                <ErrorMessage name="password" component="div" className="text-red-500" />
+              </label>
+              <label className="w-1/2 block">
+                Confirm Password
+                <Field
+                  type="password"
+                  name="confirmPassword"
+                  className="w-full px-4 py-2 border rounded-xl"
+                />
+                <ErrorMessage name="confirmPassword" component="div" className="text-red-500" />
+              </label>
+            </div>
 
-      <div className="flex justify-center">
-        <button
-          type="submit"
-          className="w-[50%] bg-[#4D0000] text-white py-2 rounded-full cursor-pointer"
-        >
-          {type === "signup" ? "Register" : "Login"}
-        </button>
-      </div>
-    </form>
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                className="w-[50%] bg-[#4D0000] text-white py-2 rounded-full cursor-pointer"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Processing..." : "signup"}
+              </button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    </>
   );
 }
 

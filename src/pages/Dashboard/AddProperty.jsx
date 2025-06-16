@@ -1,22 +1,22 @@
 import MainLayout from "../../layout/MainLayout";
 import { useState, useRef } from "react";
-import { useProperties } from "../../context/PropertyContext";
+import { createProperty } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/24/solid"; // Add this import at the top
 
 function AddProperty() {
-  const { addProperty } = useProperties();
+  // const { addProperty } = useProperties();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
+    description: "",
     type: "",
+    rentalPrice: "",
+    photos: [],
     category: "",
     address: "",
-    price: "",
     location: "",
-    description: "",
-    images: [],
   });
   const fileInputRef = useRef(null);
 
@@ -52,17 +52,16 @@ function AddProperty() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // You may need to handle file upload logic here
-    addProperty(formData);
     navigate("/dashboard/landlord/property-listing");
     setFormData({
-      title: "",
-      type: "",
-      category: "",
-      address: "",
-      price: "",
-      location: "",
-      description: "",
-      images: [],
+    title: "",
+    description: "",
+    propertyType: "",
+    rentalPrice: "",
+    photos: [],
+    category: "",
+    address: "",
+    location: "",
     });
   };
 
@@ -108,7 +107,7 @@ function AddProperty() {
               <option value="">Select type</option>
               <option value="apartment">Apartment</option>
               <option value="house">House</option>
-              <option value="condo">Condo</option>
+              {/* <option value="condo">Condo</option> */}
               {/* Add more types as needed */}
             </select>
           </div>

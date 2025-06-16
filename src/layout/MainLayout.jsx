@@ -1,12 +1,24 @@
 import { Link } from "react-router-dom";
-import { useUser } from "../context/UserContext";
 import logo from "../assets/footerlogo.png";
 import { Home, Users, Wallet, Plus, List, Eye, Wrench, Mail, Settings, UserCircle, Bell, ListCheckIcon } from "lucide-react";
+import {jwtDecode} from "jwt-decode";
 
 function MainLayout({ children }) {
-  const { user } = useUser() || {};
-  const username = user?.name || "Landlord";
-  const role = user?.role || "landlord";
+  const user = JSON.parse(localStorage.getItem("user"));
+  let username = "";
+  if (user?. fullName && user.fullName !== "User") {
+    username = user.fullName;
+  }else if (user?.name) {
+    username = user.name;
+  } else if (user?.access_token){
+    try{
+      const decoded =jwtDecode(user.access_token);
+      username = decoded.email || "User"
+    }catch (e) {
+      username = "User";
+    }
+  }
+  const role = user?.role ||user?.accountType || "landlord";
 
   // Landlord sidebar links
   const landlordLinks = (
@@ -100,7 +112,7 @@ function MainLayout({ children }) {
       <aside className="w-64 bg-[#4D0000] text-white p-6 h-screen fixed top-0 left-0 flex flex-col">
         <img src={logo} alt="RentHouse Logo" className="h-12 w-[100px] mb-6" />
         {/* Render links based on user role */}
-        {user?.role === "tenant"
+        {role === "tenant"
           ? tenantLinks 
           : landlordLinks}
         {/* Logout */}
