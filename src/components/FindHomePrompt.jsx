@@ -1,4 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom"
+
+
 
 function FindHomePrompt() {
   return (
@@ -11,12 +14,16 @@ function FindHomePrompt() {
         their perfect home
       </p>
       <div className="flex gap-6">
+        <Link to="/signup">
         <button className="bg-[#4D0000] text-white font-bold text-lg px-8 py-3 rounded transition font-inter cursor-pointer">
           I’m a Tenant
         </button>
+        </Link>
+        <Link to="/signup">
         <button className="border-2 border-[#4D0000] text-[#4D0000] font-bold text-lg px-8 py-3 rounded transition  font-inter cursor-pointer ">
           I’m a Landlord
         </button>
+        </Link>
       </div>
     </section>
   );

@@ -40,7 +40,7 @@ function MainLayout({ children }) {
       {/* Quick Links Heading */}
       <h2 className="text-[24px] font-bold mb-4 mt-8">Quick Links</h2>
       <nav className="flex flex-col space-y-2 mb-8">
-        <Link to="/dashboard/landlord/add" className="flex items-center gap-2 hover:underline">
+        <Link to="/dashboard/landlord/addproperty" className="flex items-center gap-2 hover:underline">
           <Plus size={18} /> Add Item
         </Link>
         <Link to="/dashboard/landlord/property-listing" className="flex items-center gap-2 hover:underline">
@@ -71,21 +71,21 @@ function MainLayout({ children }) {
     <>
       <h1 className="text-[20px] font-semibold mb-4">Tenant Dashboard</h1>
       <nav className="flex flex-col space-y-2 mb-8">
+        <Link to="/dashboard/tenant/profile" className="flex items-center gap-2 hover:underline">
+          <Users size={18} /> Profile
+        </Link>
         <Link to="/dashboard/tenant/listing" className="flex items-center gap-2 hover:underline">
           <ListCheckIcon size={18} /> Listing
         </Link>
         <Link to="/dashboard/tenant/payments" className="flex items-center gap-2 hover:underline">
           <Wallet size={18} /> Payments
         </Link>
-        <Link to="/dashboard/tenant/profile" className="flex items-center gap-2 hover:underline">
-          <Users size={18} /> Profile
-        </Link>
       </nav>
 
       <h2 className="text-[20px] font-semibold mb-4 mt-8">Quick Links</h2>
       <nav className="flex flex-col space-y-2 mb-8">
         <Link to="/dashboard/tenant/rent-receipt" className="flex items-center gap-2 hover:underline">
-          <Plus size={18} /> Rent Receipt
+          <Plus size={18} /> Rental Receipt
         </Link>
         <Link to="/dashboard/tenant/rent-history" className="flex items-center gap-2 hover:underline">
           <List size={18} /> Rent History

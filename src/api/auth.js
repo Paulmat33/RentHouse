@@ -14,8 +14,8 @@ export const signupActionLandlord = (data) => {
 export const loginAction = (data) => {
   return api.post("/auth/login", data);
 };
-export const createProperty = (propertyData, token) =>{
-  return api.post("/properties", propertyData, {
+export const createProperty = (data, token) =>{
+  return api.post("/properties", data, {
     headers: {
       Authorization: `Bearer ${token}`
     }

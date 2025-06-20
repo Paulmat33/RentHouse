@@ -1,8 +1,11 @@
+import MainLayout from "../layout/MainLayout";
 
 const PropertyListing = () => {
   return (
-    <div>PropertyListing</div>
-  )
-}
+    <MainLayout>
+      <div>PropertyListing</div>
+    </MainLayout>
+  );
+};
 
-export default PropertyListing
+export default PropertyListing;

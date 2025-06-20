@@ -1,87 +1,185 @@
 import MainLayout from "../../layout/MainLayout";
 import { useState, useRef } from "react";
-import { createProperty } from "../../api/auth";
+// import { createProperty } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { XMarkIcon } from "@heroicons/react/24/solid"; // Add this import at the top
+import { XMarkIcon } from "@heroicons/react/24/solid";
+import { toast, ToastContainer } from "react-toastify";
 
 function AddProperty() {
-  // const { addProperty } = useProperties();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    type: "",
+    propertyType: "",
     rentalPrice: "",
-    photos: [],
-    category: "",
-    address: "",
-    location: "",
+    images: [],
+    amenities: [],
+    propertyAddress: "",
+    propertyCategory: "",
   });
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleFileChange = (e) => {
-    const newFiles = Array.from(e.target.files);
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, ...newFiles.filter(
-        file => !prev.images.some(img => img.name === file.name && img.size === file.size)
-      )],
-    }));
+    const files = Array.from(e.target.files);
+    setFormData((prev) => {
+      const newImages = [...prev.images, ...files].slice(0, 5);
+      if (newImages.length < prev.images.length + files.length) {
+        toast.info("You can only upload up to 5 images.");
+      }
+      return { ...prev, images: newImages };
+    });
   };
 
+  // Drag and drop support
   const handleDrop = (e) => {
     e.preventDefault();
-    const newFiles = Array.from(e.dataTransfer.files);
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, ...newFiles.filter(
-        file => !prev.images.some(img => img.name === file.name && img.size === file.size)
-      )],
-    }));
+    e.stopPropagation();
+    const files = Array.from(e.dataTransfer.files).filter((file) =>
+      file.type.startsWith("image/")
+    );
+    setFormData((prev) => {
+      const newImages = [...prev.images, ...files].slice(0, 5);
+      if (newImages.length < prev.images.length + files.length) {
+        toast.info("You can only upload up to 5 images.");
+      }
+      return { ...prev, images: newImages };
+    });
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
+    e.stopPropagation();
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // You may need to handle file upload logic here
-    navigate("/dashboard/landlord/property-listing");
-    setFormData({
-    title: "",
-    description: "",
-    propertyType: "",
-    rentalPrice: "",
-    photos: [],
-    category: "",
-    address: "",
-    location: "",
+  // Remove image by index
+  const handleRemoveImage = (idx) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== idx),
+    }));
+  };
+
+  // Handle amenities as checkboxes
+  const handleAmenityChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prev) => {
+      const amenities = checked
+        ? [...prev.amenities, value]
+        : prev.amenities.filter((a) => a !== value);
+      return { ...prev, amenities };
     });
   };
 
-  // Add this function inside your AddProperty component
-  const handleRemoveImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, idx) => idx !== index),
-    }));
+  async function uploadImageToCloudinary(file) {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "unsigned_preset"); // Replace with your preset
+
+    const response = await fetch(
+      "https://api.cloudinary.com/v1_1/dirb6q9wv/image/upload",
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+    const result = await response.json();
+    return result.secure_url;
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+
+    if (formData.images.length < 1) {
+      toast.error("Please select at least one photo.");
+      setUploading(false);
+      return;
+    }
+    if (formData.images.length > 5) {
+      toast.error("You can only upload up to 5 images.");
+      setUploading(false);
+      return;
+    }
+
+    try {
+      const photoUrls = await Promise.all(
+        formData.images.slice(0, 5).map((file) => uploadImageToCloudinary(file))
+      );
+
+      if (!photoUrls.length) {
+        toast.error("Image upload failed. Please try again.");
+        setUploading(false);
+        return;
+      }
+
+      // Build FormData
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("description", formData.description);
+      data.append("propertyType", formData.propertyType);
+      data.append("rentalPrice", formData.rentalPrice);
+      data.append("propertyAddress", formData.propertyAddress);
+      data.append("propertyCategory", formData.propertyCategory);
+
+      // Append each photo URL as a separate 'photos' field
+      photoUrls.forEach((url) => data.append("photos", url));
+
+      // Append each amenity as a separate 'amenities' field
+      formData.amenities.forEach((a) => data.append("amenities", a));
+
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.access_token;
+
+      // If using fetch:
+      await fetch("https://house-jrep.onrender.com/properties", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Do NOT set Content-Type, let browser set it for FormData
+        },
+        body: data,
+      });
+
+      setFormData({
+        title: "",
+        description: "",
+        propertyType: "",
+        rentalPrice: "",
+        images: [],
+        amenities: [],
+        propertyAddress: "",
+        propertyCategory: "",
+      });
+      toast.success("successful")
+      // navigate("/dashboard/landlord/property-listing");
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Submission failed.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
     <MainLayout>
+      <ToastContainer />
       <button
         type="button"
         className="flex items-center mb-4 text-[#000000] cursor-pointer"
         onClick={() => navigate("/dashboard/landlord")}
       >
         <ArrowLeftIcon className="h-5 w-5 mr-1" />
-      <h2 className="text-2xl font-bold">Add Property</h2>
+        <h2 className="text-2xl font-bold">Add Property</h2>
       </button>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
         <div>
@@ -89,9 +187,9 @@ function AddProperty() {
           <input
             name="title"
             type="text"
-            // placeholder="Enter property title"
             className="w-full p-2 border rounded-xl"
             onChange={handleChange}
+            value={formData.title}
             required
           />
         </div>
@@ -99,66 +197,56 @@ function AddProperty() {
           <div className="flex-1">
             <label className="block mb-1 font-bold">Property Type</label>
             <select
-              name="type"
+              name="propertyType"
               className="w-full p-2 border rounded-xl"
               onChange={handleChange}
+              value={formData.propertyType}
               required
             >
               <option value="">Select type</option>
-              <option value="apartment">Apartment</option>
-              <option value="house">House</option>
-              {/* <option value="condo">Condo</option> */}
+              <option value="Bungalow">Bungalow</option>
+              <option value="Duplex">Duplex</option>
+              <option value="3 Bedroom">3 Bedroom</option>
               {/* Add more types as needed */}
             </select>
           </div>
           <div className="flex-1">
             <label className="block mb-1 font-bold">Property Category</label>
             <select
-              name="category"
+              name="propertyCategory"
               className="w-full p-2 border rounded-xl"
               onChange={handleChange}
+              value={formData.propertyCategory}
               required
             >
               <option value="">Select category</option>
               <option value="rent">Rent</option>
               <option value="sale">Sale</option>
-              {/* Add more categories as needed */}
             </select>
           </div>
         </div>
 
         <div className="flex gap-4">
           <div className="flex-1">
-            <label className="block mb-1 font-bold">Location</label>
-            <input
-            name="location"
-            type="text"
-            // placeholder="Enter address"
-            className="w-full p-2 border rounded-xl"
-            onChange={handleChange}
-            required
-          />
-          </div>
-          <div className="flex-1">
             <label className="block mb-1 font-bold">Price</label>
-           <input
-            name="price"
-            type="number"
-            // placeholder="Enter address"
-            className="w-full p-2 border rounded-xl"
-            onChange={handleChange}
-            required
-          />
+            <input
+              name="rentalPrice"
+              type="number"
+              className="w-full p-2 border rounded-xl"
+              onChange={handleChange}
+              value={formData.rentalPrice}
+              required
+            />
           </div>
         </div>
         <div>
           <label className="block mb-1 font-bold">Property Address</label>
           <input
-            name="address"
+            name="propertyAddress"
             type="text"
-            // placeholder="Enter address"
             className="w-full p-2 border rounded-xl"
             onChange={handleChange}
+            value={formData.propertyAddress}
             required
           />
         </div>
@@ -166,15 +254,35 @@ function AddProperty() {
           <label className="block mb-1 font-bold">Description</label>
           <textarea
             name="description"
-            // placeholder="Enter description"
             className="w-full p-2 border rounded-xl h-[250px]"
             rows={3}
             onChange={handleChange}
+            value={formData.description}
             required
           ></textarea>
         </div>
         <div>
-          <label className="block mb-4 font-bold">Upload image(s) of the property</label>
+          <label className="block mb-1 font-bold">Amenities</label>
+          <div className="flex gap-4 flex-wrap">
+            {["light", "water", "air-conditioning", "solar electricity"].map(
+              (amenity) => (
+                <label key={amenity} className="flex items-center gap-1">
+                  <input
+                    type="checkbox"
+                    value={amenity}
+                    checked={formData.amenities.includes(amenity)}
+                    onChange={handleAmenityChange}
+                  />
+                  {amenity}
+                </label>
+              )
+            )}
+          </div>
+        </div>
+        <div>
+          <label className="block mb-4 font-bold">
+            Upload image(s) of the property
+          </label>
           <div
             className="w-full p-4 border-2 border-[#000000D1] border-dashed rounded text-center cursor-pointer bg-[#D9D9D9] h-[200px] flex flex-col items-center justify-center"
             onDrop={handleDrop}
@@ -184,14 +292,16 @@ function AddProperty() {
             <button
               type="button"
               className="bg-white text-[#4D0000] px-4 py-2 rounded shadow cursor-pointer"
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 fileInputRef.current.click();
               }}
             >
               Upload Photo
             </button>
-            <span className="mt-2">Drag & drop or choose file to upload</span>
+            <span className="mt-2">
+              Drag & drop or choose file to upload (max 5)
+            </span>
             <input
               ref={fileInputRef}
               type="file"
@@ -219,19 +329,21 @@ function AddProperty() {
                     alt={file.name}
                     className="w-24 h-24 object-cover rounded mb-1 border"
                   />
-                  <span className="text-xs text-center break-all">{file.name}</span>
+                  <span className="text-xs text-center break-all">
+                    {file.name}
+                  </span>
                 </div>
               ))}
             </div>
           )}
         </div>
-        {/* Add Property Button Centered */}
         <div className="flex justify-center">
           <button
             type="submit"
             className="bg-[#4D0000] text-white px-4 py-2 rounded cursor-pointer "
+            disabled={uploading}
           >
-            Add Property
+            {uploading ? "Uploading..." : "Add Property"}
           </button>
         </div>
       </form>

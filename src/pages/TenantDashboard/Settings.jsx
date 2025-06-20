@@ -1,12 +1,12 @@
 import React from 'react'
 import MainLayout from '../../layout/MainLayout'
 
-const Tenant = () => {
+const Settings = () => {
   return (
     <MainLayout>
-      <div>Tenant</div>
+      <div>Settings</div>
     </MainLayout>
   )
 }
 
-export default Tenant
+export default Settings
